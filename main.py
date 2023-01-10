@@ -22,15 +22,15 @@ class User(db.Model):
     role = db.Column(db.String(100))
     phone = db.Column(db.String(100))
 
-    def to_dict(self):
+    def to_dict(self, arg):
         return {
-            "id": self.id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "age": self.age,
-            "email": self.email,
-            "role": self.role,
-            "phone": self.phone
+            "id": arg.id,
+            "first_name": arg.first_name,
+            "last_name": arg.last_name,
+            "age": arg.age,
+            "email": arg.email,
+            "role": arg.role,
+            "phone": arg.phone
         }
 
 
@@ -40,11 +40,11 @@ class Offer(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey("order.id"))
     executor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    def to_dict(self):
+    def to_dict(self, arg):
         return {
-            "id": self.id,
-            "order_id": self.order_id,
-            "executor_id": self.executor_id
+            "id": arg.id,
+            "order_id": arg.order_id,
+            "executor_id": arg.executor_id
         }
 
 
@@ -60,33 +60,32 @@ class Order(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     executor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    def to_dict(self):
+    def to_dict(self, arg):
         return {
-            "id": self.id,
-            "name": self.name,
-            "description": self.description,
-            "start_date": self.start_date,
-            "end_date": self.end_date,
-            "address": self.address,
-            "price": self.price,
-            "customer_id": self.customer_id,
-            "executor_id": self.executor_id
+            "id": arg.id,
+            "name": arg.name,
+            "description": arg.description,
+            "start_date": arg.start_date,
+            "end_date": arg.end_date,
+            "address": arg.address,
+            "price": arg.price,
+            "customer_id": arg.customer_id,
+            "executor_id": arg.executor_id
         }
-
 @app.route('/users', methods=["GET"])
 def get_users():
-    id = request.args.get("id")
     result = []
-    if not id:
-        users = User.query.all()
-        for user in users:
-            result.append(user.to_dict(user))
-        return json.dumps(result)
-    users = User.query.filter_by(id=id)
+    users = User.query.all()
     for user in users:
         result.append(user.to_dict(user))
     return json.dumps(result)
 
+@app.route('/users/<int:uid>', methods=["GET"])
+def get_user(uid):
+    result = []
+    user = User.query.get(uid)
+    result.append(user.to_dict(user))
+    return result
 
 @app.route('/users', methods=["POST"])
 def add_user():
@@ -117,8 +116,6 @@ def edit_user(uid):
 
     db.session.add(user)
     db.session.commit()
-
-
 @app.route('/users/<int:uid>', methods=['DELETE'])
 def delete_user(uid):
     user = User.query.get(uid)
@@ -127,19 +124,18 @@ def delete_user(uid):
 
 @app.route('/offers', methods=['GET'])
 def get_offers():
-    id = request.args.get("id")
     result = []
-    if not id:
-        offers = Offer.query.all()
-        for offer in offers:
-            result.append(offers.to_dict(offer))
-        return json.dumps(result)
-    offers = Offer.query.filter_by(id=id)
+    offers = Offer.query.all()
     for offer in offers:
-        result.append(offers.to_dict(offer))
+        result.append(offer.to_dict(offer))
     return json.dumps(result)
 
-
+@app.route('/offers/<int:oid>', methods=['GET'])
+def get_offer(oid):
+    result = []
+    offer = Offer.query.get(oid)
+    result.append(offer.to_dict(offer))
+    return result
 @app.route('/offers', methods=["POST"])
 def add_offer():
     offer = json.loads(request.data)
@@ -170,18 +166,18 @@ def delete_offer(ofid):
 
 @app.route('/orders', methods=["GET"])
 def get_orders():
-    id = request.args.get("id")
     result = []
-    if not id:
-        orders = Order.query.all()
-        for order in orders:
-            result.append(orders.to_dict(order))
-        return json.dumps(result)
-    orders = Order.query.filter_by(id=id)
+    orders = Order.query.all()
     for order in orders:
-        result.append(orders.to_dict(order))
+         result.append(order.to_dict(order))
     return json.dumps(result)
 
+@app.route('/orders/<int:oid>', methods=["GET"])
+def get_order(oid):
+    result = []
+    order = Order.query.get(oid)
+    result.append(order.to_dict(order))
+    return result
 
 @app.route('/orders', methods=["POST"])
 def add_order():
