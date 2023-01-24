@@ -78,14 +78,14 @@ def get_users():
     users = User.query.all()
     for user in users:
         result.append(user.to_dict(user))
-    return json.dumps(result)
+    return json.dumps(result), 200
 
 @app.route('/users/<int:uid>', methods=["GET"])
 def get_user(uid):
     result = []
     user = User.query.get(uid)
     result.append(user.to_dict(user))
-    return result
+    return result, 200
 
 @app.route('/users', methods=["POST"])
 def add_user():
@@ -101,6 +101,7 @@ def add_user():
     )
     db.session.add(new_user)
     db.session.commit()
+    return "", 201
 
 
 @app.route('/users/<int:uid>', methods=['PUT'])
@@ -116,11 +117,13 @@ def edit_user(uid):
 
     db.session.add(user)
     db.session.commit()
+    return "", 204
 @app.route('/users/<int:uid>', methods=['DELETE'])
 def delete_user(uid):
     user = User.query.get(uid)
     db.session.delete(user)
     db.session.commit()
+    return "", 204
 
 @app.route('/offers', methods=['GET'])
 def get_offers():
@@ -128,14 +131,14 @@ def get_offers():
     offers = Offer.query.all()
     for offer in offers:
         result.append(offer.to_dict(offer))
-    return json.dumps(result)
+    return json.dumps(result), 200
 
 @app.route('/offers/<int:oid>', methods=['GET'])
 def get_offer(oid):
     result = []
     offer = Offer.query.get(oid)
     result.append(offer.to_dict(offer))
-    return result
+    return result, 200
 @app.route('/offers', methods=["POST"])
 def add_offer():
     offer = json.loads(request.data)
@@ -147,6 +150,7 @@ def add_offer():
 
     db.session.add(new_offer)
     db.session.commit()
+    return "", 201
 
 @app.route('/offers/<int:oid>', methods=['PUT'])
 def edit_offer(oid):
@@ -157,12 +161,14 @@ def edit_offer(oid):
 
     db.session.add(offer)
     db.session.commit()
+    return "", 204
 
 @app.route('/offers/<int:ofid>', methods=['DELETE'])
 def delete_offer(ofid):
     offer = Offer.query.get(ofid)
     db.session.delete(offer)
     db.session.commit()
+    return "", 204
 
 @app.route('/orders', methods=["GET"])
 def get_orders():
@@ -170,14 +176,14 @@ def get_orders():
     orders = Order.query.all()
     for order in orders:
          result.append(order.to_dict(order))
-    return json.dumps(result)
+    return json.dumps(result), 200
 
 @app.route('/orders/<int:oid>', methods=["GET"])
 def get_order(oid):
     result = []
     order = Order.query.get(oid)
     result.append(order.to_dict(order))
-    return result
+    return result, 200
 
 @app.route('/orders', methods=["POST"])
 def add_order():
@@ -196,6 +202,7 @@ def add_order():
 
     db.session.add(new_order)
     db.session.commit()
+    return "", 201
 
 
 @app.route('/orders/<int:oid>', methods=['PUT'])
@@ -212,6 +219,7 @@ def edit_order(oid):
 
     db.session.add(order)
     db.session.commit()
+    return "", 204
 
 
 @app.route('/orders/<int:oid>', methods=['DELETE'])
@@ -219,6 +227,7 @@ def delete_order(oid):
     order = Order.query.get(oid)
     db.session.delete(order)
     db.session.commit()
+    return "", 204
 
 def create_database():
     with app.app_context():
